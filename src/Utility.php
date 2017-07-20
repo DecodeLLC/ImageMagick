@@ -119,6 +119,10 @@ abstract class Utility
 		{
 			$context['format'] = $this->getDispatcher()->getImage()->getProperty(Image::PROPERTY_FORMAT);
 		}
+		if ($this->getDispatcher()->getImage()->hasProperty(Image::PROPERTY_COLORSPACE))
+		{
+			$context['colorspace'] = $this->getDispatcher()->getImage()->getProperty(Image::PROPERTY_COLORSPACE);
+		}
 		if ($this->getDispatcher()->getImage()->hasProperty(Image::PROPERTY_ICC_PROFILE))
 		{
 			$context['profile.icc'] = $this->getDispatcher()->getImage()->getProperty(Image::PROPERTY_ICC_PROFILE);
