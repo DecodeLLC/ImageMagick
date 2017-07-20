@@ -1,5 +1,5 @@
 {
-	"name": "DecodeLLC/ImageMagick",
+	"name": "decodellc/imagemagick",
 	"description": "Wrapper for ImageMagick on PHP.",
 	"keywords": ["php", "imagemagick", "library"],
 	"homepage": "https://github.com/DecodeLLC/ImageMagick",
