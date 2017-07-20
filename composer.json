@@ -1,0 +1,17 @@
+{
+	"name": "DecodeLLC/ImageMagick",
+	"description": "Wrapper for ImageMagick on PHP.",
+	"keywords": ["php", "imagemagick", "library"],
+	"homepage": "https://github.com/DecodeLLC/ImageMagick",
+	"license": "MIT",
+	"authors": [{
+		"name": "Anatoly Fenric",
+		"homepage": "https://anatoly.fenric.ru/"
+	}],
+	"require": {
+		"php": ">=5.6.0"
+	},
+	"autoload": {
+		"files": ["autoload.php"]
+	}
+}
