@@ -101,6 +101,57 @@ class Convert extends AbstractUtility
 	/**
 	 * {description}
 	 *
+	 * @param   int      $width
+	 * @param   int      $height
+	 * @param   int      $xPosition
+	 * @param   int      $yPosition
+	 * @param   string   $format
+	 *
+	 * @access  public
+	 * @return  bool
+	 */
+	public function crop($width, $height, $xPosition = 0, $yPosition = 0, $format = null)
+	{
+		$format = $format ?: $this->getDispatcher()->getImage()->getFormat();
+
+		$context = [
+			'new.width' => $width,
+			'new.height' => $height,
+			'x.position' => $xPosition,
+			'y.position' => $yPosition,
+			'output.format' => $format,
+		];
+
+		return $this->execute('{bin} "{format}:{image}" -crop {new.width}x{new.height}+{x.position}+{y.position} "{output.format}:{image}"', $context);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @param   int      $radius
+	 * @param   string   $format
+	 *
+	 * @access  public
+	 * @return  bool
+	 */
+	public function roundCorners($radius, $format = null)
+	{
+		$format = $format ?: $this->getDispatcher()->getImage()->getFormat();
+
+		$command = '\
+			{bin} -size {width}x{height} xc:none -draw "roundrectangle 0,0,{width},{height},{radius},{radius}" "PNG:{image}.mask" && \
+			{bin} "{format}:{image}" -matte "PNG:{image}.mask" -compose DstIn -composite "{output.format}:{image}" && \
+			rm -f "{image}.mask"
+		';
+
+		$context = ['radius' => $radius, 'output.format' => $format];
+
+		return $this->execute($command, $context);
+	}
+
+	/**
+	 * {description}
+	 *
 	 * @param   string   $profileCMYK
 	 * @param   string   $profileSRGB
 	 * @param   string   $outputFormat
@@ -128,6 +179,8 @@ class Convert extends AbstractUtility
 
 			return $this->execute($command, [
 				'output.format' => $outputFormat,
+				'profile.cmyk.icc' => $profileCMYK,
+				'profile.srgb.icc' => $profileSRGB,
 			]);
 		}
 
@@ -138,6 +191,7 @@ class Convert extends AbstractUtility
 			return $this->execute($command, [
 				'output.format' => $outputFormat,
 				'profile.cmyk.icc' => $profileCMYK,
+				'profile.srgb.icc' => $profileSRGB,
 			]);
 		}
 
@@ -148,6 +202,7 @@ class Convert extends AbstractUtility
 			return $this->execute($command, [
 				'output.format' => $outputFormat,
 				'profile.cmyk.icc' => $profileCMYK,
+				'profile.srgb.icc' => $profileSRGB,
 			]);
 		}
 
@@ -157,16 +212,17 @@ class Convert extends AbstractUtility
 
 			return $this->execute($command, [
 				'output.format' => $outputFormat,
-				'profile.srgb.icc' => $profileSRGB,
 				'profile.cmyk.icc' => $profileCMYK,
+				'profile.srgb.icc' => $profileSRGB,
 			]);
 		}
 
-		$command = '{bin} "{format}:{image}" -intent relative -black-point-compensation -profile "icc:{profile.cmyk.icc}" "{output.format}:{image}"';
+		$command = '{bin} "{format}:{image}" -colorspace CMYK -intent relative -black-point-compensation -set profile "icc:{profile.cmyk.icc}" "{output.format}:{image}"';
 
 		return $this->execute($command, [
 			'output.format' => $outputFormat,
 			'profile.cmyk.icc' => $profileCMYK,
+			'profile.srgb.icc' => $profileSRGB,
 		]);
 	}
 
@@ -180,7 +236,7 @@ class Convert extends AbstractUtility
 	 * @access  public
 	 * @return  bool
 	 */
-	public function toRGB($profileSRGB, $profileCMYK = null, $outputFormat = null)
+	public function toSRGB($profileSRGB, $profileCMYK = null, $outputFormat = null)
 	{
 		if (defined('DECODELLC_IMAGEMAGICK_PATH_DEFAULT_PROFILE_CMYK_ICC') && empty($profileCMYK))
 		{
@@ -200,6 +256,8 @@ class Convert extends AbstractUtility
 
 			return $this->execute($command, [
 				'output.format' => $outputFormat,
+				'profile.cmyk.icc' => $profileCMYK,
+				'profile.srgb.icc' => $profileSRGB,
 			]);
 		}
 
@@ -209,6 +267,7 @@ class Convert extends AbstractUtility
 
 			return $this->execute($command, [
 				'output.format' => $outputFormat,
+				'profile.cmyk.icc' => $profileCMYK,
 				'profile.srgb.icc' => $profileSRGB,
 			]);
 		}
@@ -219,6 +278,7 @@ class Convert extends AbstractUtility
 
 			return $this->execute($command, [
 				'output.format' => $outputFormat,
+				'profile.cmyk.icc' => $profileCMYK,
 				'profile.srgb.icc' => $profileSRGB,
 			]);
 		}
@@ -234,10 +294,11 @@ class Convert extends AbstractUtility
 			]);
 		}
 
-		$command = '{bin} "{format}:{image}" -profile "icc:{profile.srgb.icc}" "{output.format}:{image}"';
+		$command = '{bin} "{format}:{image}" -colorspace sRGB -set profile "icc:{profile.srgb.icc}" "{output.format}:{image}"';
 
 		return $this->execute($command, [
 			'output.format' => $outputFormat,
+			'profile.cmyk.icc' => $profileCMYK,
 			'profile.srgb.icc' => $profileSRGB,
 		]);
 	}
