@@ -392,7 +392,7 @@ class Image
 	 */
 	public function isCMY()
 	{
-		return 0 === strcmp($this->getColorspace(), 'CMY');
+		return 0 === strcasecmp($this->getColorspace(), 'CMY');
 	}
 
 	/**
@@ -403,7 +403,7 @@ class Image
 	 */
 	public function isCMYK()
 	{
-		return 0 === strcmp($this->getColorspace(), 'CMYK');
+		return 0 === strcasecmp($this->getColorspace(), 'CMYK');
 	}
 
 	/**
@@ -414,7 +414,7 @@ class Image
 	 */
 	public function isRGB()
 	{
-		return 0 === strcmp($this->getColorspace(), 'RGB');
+		return 0 === strcasecmp($this->getColorspace(), 'RGB');
 	}
 
 	/**
@@ -425,7 +425,7 @@ class Image
 	 */
 	public function isSRGB()
 	{
-		return 0 === strcmp($this->getColorspace(), 'SRGB');
+		return 0 === strcasecmp($this->getColorspace(), 'sRGB');
 	}
 
 	/**
