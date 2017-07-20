@@ -14,6 +14,12 @@ const DECODELLC_IMAGEMAGICK_PATH_BIN_CONVERT = '/usr/local/bin/convert';
 const DECODELLC_IMAGEMAGICK_PATH_BIN_IDENTIFY = '/usr/local/bin/identify';
 
 /**
+ * Registration recommended constants
+ */
+const DECODELLC_IMAGEMAGICK_PATH_DEFAULT_PROFILE_CMYK_ICC = __DIR__ . '/../resources/profiles/Adobe/CMYK/JapanColor2001Uncoated.icc';
+const DECODELLC_IMAGEMAGICK_PATH_DEFAULT_PROFILE_SRGB_ICC = __DIR__ . '/../resources/profiles/color.org/sRGB2014.icc';
+
+/**
  * Library classes autoload
  */
 require_once __DIR__ . '/../autoload.php';
@@ -26,9 +32,9 @@ try
 
 	$dispatcher = new Dispatcher(new Image($image));
 
-	var_dump($dispatcher->getConvertInstance()->execute('{bin} "{format}:{image}" -resize 100x100 "{format}:{image}"'));
+	$dispatcher->getConvertInstance()->resize(512, 512);
 
-	var_dump($dispatcher->getImage()->save(__DIR__ . '/example.resized.jpg'));
+	$dispatcher->getImage()->save(__DIR__ . '/example.processed.png');
 }
 
 catch (ImageMagickException $e)
