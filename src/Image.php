@@ -14,17 +14,19 @@ class Image
 	/**
 	 * {description}
 	 */
-	const PROPERTY_WIDTH       = 1;
-	const PROPERTY_HEIGHT      = 2;
-	const PROPERTY_FORMAT      = 3;
-	const PROPERTY_MIME_TYPE   = 4;
-	const PROPERTY_UNITS       = 5;
-	const PROPERTY_RESOLUTION  = 6;
-	const PROPERTY_DEPTH       = 7;
-	const PROPERTY_COLORSPACE  = 8;
-	const PROPERTY_COMPRESSION = 9;
-	const PROPERTY_QUALITY     = 10;
-	const PROPERTY_PROFILES    = 11;
+	const PROPERTY_WIDTH        = 1;
+	const PROPERTY_HEIGHT       = 2;
+	const PROPERTY_FORMAT       = 3;
+	const PROPERTY_MIME_TYPE    = 4;
+	const PROPERTY_UNITS        = 5;
+	const PROPERTY_RESOLUTION   = 6;
+	const PROPERTY_DEPTH        = 7;
+	const PROPERTY_COLORSPACE   = 8;
+	const PROPERTY_COMPRESSION  = 9;
+	const PROPERTY_QUALITY      = 10;
+	const PROPERTY_PROFILES     = 11;
+	const PROPERTY_ICC_PROFILE  = 12;
+	const PROPERTY_IPTC_PROFILE = 13;
 
 	/**
 	 * {description}
@@ -73,9 +75,20 @@ class Image
 	 */
 	public function __destruct()
 	{
-		$this->isReady() and unlink(
-			$this->getTemporaryPath()
-		);
+		file_exists($this->getTemporaryPath())
+			and unlink($this->getTemporaryPath());
+
+		if ($this->hasProperty(self::PROPERTY_ICC_PROFILE))
+		{
+			file_exists($this->getProperty(self::PROPERTY_ICC_PROFILE))
+				and unlink($this->getProperty(self::PROPERTY_ICC_PROFILE));
+		}
+
+		if ($this->hasProperty(self::PROPERTY_IPTC_PROFILE))
+		{
+			file_exists($this->getProperty(self::PROPERTY_IPTC_PROFILE))
+				and unlink($this->getProperty(self::PROPERTY_IPTC_PROFILE));
+		}
 	}
 
 	/**
@@ -259,6 +272,160 @@ class Image
 		}
 
 		return false;
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  int
+	 */
+	public function getWidth()
+	{
+		return $this->getProperty(self::PROPERTY_WIDTH);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  int
+	 */
+	public function getHeight()
+	{
+		return $this->getProperty(self::PROPERTY_HEIGHT);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  string
+	 */
+	public function getFormat()
+	{
+		return $this->getProperty(self::PROPERTY_FORMAT);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  string
+	 */
+	public function getMimeType()
+	{
+		return $this->getProperty(self::PROPERTY_MIME_TYPE);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  string
+	 */
+	public function getUnits()
+	{
+		return $this->getProperty(self::PROPERTY_UNITS);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  string
+	 */
+	public function getResolution()
+	{
+		return $this->getProperty(self::PROPERTY_RESOLUTION);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  string
+	 */
+	public function getDepth()
+	{
+		return $this->getProperty(self::PROPERTY_DEPTH);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  string
+	 */
+	public function getColorspace()
+	{
+		return $this->getProperty(self::PROPERTY_COLORSPACE);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  string
+	 */
+	public function getCompression()
+	{
+		return $this->getProperty(self::PROPERTY_COMPRESSION);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  int
+	 */
+	public function getQuality()
+	{
+		return $this->getProperty(self::PROPERTY_QUALITY);
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  bool
+	 */
+	public function isCMY()
+	{
+		return 0 === strcmp($this->getColorspace(), 'CMY');
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  bool
+	 */
+	public function isCMYK()
+	{
+		return 0 === strcmp($this->getColorspace(), 'CMYK');
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  bool
+	 */
+	public function isRGB()
+	{
+		return 0 === strcmp($this->getColorspace(), 'RGB');
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  bool
+	 */
+	public function isSRGB()
+	{
+		return 0 === strcmp($this->getColorspace(), 'SRGB');
 	}
 
 	/**
