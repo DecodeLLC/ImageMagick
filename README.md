@@ -1,6 +1,4 @@
-# Install
-
-## Via composer:
+# Install via composer:
 
 ```
 composer require decodellc/imagemagick
