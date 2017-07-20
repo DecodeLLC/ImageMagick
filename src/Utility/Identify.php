@@ -41,7 +41,7 @@ class Identify extends AbstractUtility
 
 			if (preg_match('/^\s*Format:\s*(?<value>[^\s]+)/i', $property, $matches))
 			{
-				$this->getDispatcher()->getImage()->setProperty(Image::PROPERTY_FORMAT, $matches['value']);
+				$this->getDispatcher()->getImage()->setProperty(Image::PROPERTY_FORMAT, strtoupper($matches['value']));
 			}
 
 			if (preg_match('/^\s*Mime\s*type:\s*(?<value>[^\s]+)/i', $property, $matches))
@@ -79,15 +79,41 @@ class Identify extends AbstractUtility
 				$this->getDispatcher()->getImage()->setProperty(Image::PROPERTY_QUALITY, (int) $matches['value']);
 			}
 
-			if (preg_match('/^\s*Profile-(?<value>[\w\d]+):/i', $property, $matches))
+			if (preg_match('/^\s*Profile-(?<value>(?:ICC|IPTC)):/i', $property, $matches))
 			{
-				$profiles[] = $matches['value'];
+				$profiles[] = strtoupper($matches['value']);
 			}
 		}
 
 		if (count($profiles) > 0)
 		{
 			$this->getDispatcher()->getImage()->setProperty(Image::PROPERTY_PROFILES, $profiles);
+
+			foreach ($profiles as $name)
+			{
+				$path = $this->getDispatcher()->getImage()->getTemporaryPath() . '.' . $name;
+
+				$command = '{bin} "{format}:{image}" "{profile.name}:{profile.path}"';
+
+				$context['profile.name'] = $name;
+				$context['profile.path'] = $path;
+
+				$this->getDispatcher()->getConvertInstance()->execute($command, $context, $output, $status);
+
+				if (strcasecmp($name, 'ICC') === 0)
+				{
+					$this->getDispatcher()->getImage()->setProperty(Image::PROPERTY_ICC_PROFILE, $path);
+
+					continue;
+				}
+
+				if (strcasecmp($name, 'IPTC') === 0)
+				{
+					$this->getDispatcher()->getImage()->setProperty(Image::PROPERTY_IPTC_PROFILE, $path);
+
+					continue;
+				}
+			}
 		}
 	}
 }
