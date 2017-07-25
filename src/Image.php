@@ -14,6 +14,7 @@ class Image
 	/**
 	 * {description}
 	 */
+	const PROPERTY_SIZE         = 0;
 	const PROPERTY_WIDTH        = 1;
 	const PROPERTY_HEIGHT       = 2;
 	const PROPERTY_FORMAT       = 3;
@@ -27,6 +28,14 @@ class Image
 	const PROPERTY_PROFILES     = 11;
 	const PROPERTY_ICC_PROFILE  = 12;
 	const PROPERTY_IPTC_PROFILE = 13;
+
+	/**
+	 * {description}
+	 *
+	 * @var     string
+	 * @access  protected
+	 */
+	protected $id;
 
 	/**
 	 * {description}
@@ -62,7 +71,14 @@ class Image
 	 */
 	public function __construct($location)
 	{
+		$this->id = $this->generateId();
+
 		$this->location = $location;
+
+		register_shutdown_function(function()
+		{
+			$this->destroy();
+		});
 
 		$this->isRemote() ? $this->download() : $this->copy();
 	}
@@ -71,24 +87,11 @@ class Image
 	 * {description}
 	 *
 	 * @access  public
-	 * @return  void
+	 * @return  string
 	 */
-	public function __destruct()
+	public function getId()
 	{
-		file_exists($this->getTemporaryPath())
-			and unlink($this->getTemporaryPath());
-
-		if ($this->hasProperty(self::PROPERTY_ICC_PROFILE))
-		{
-			file_exists($this->getProperty(self::PROPERTY_ICC_PROFILE))
-				and unlink($this->getProperty(self::PROPERTY_ICC_PROFILE));
-		}
-
-		if ($this->hasProperty(self::PROPERTY_IPTC_PROFILE))
-		{
-			file_exists($this->getProperty(self::PROPERTY_IPTC_PROFILE))
-				and unlink($this->getProperty(self::PROPERTY_IPTC_PROFILE));
-		}
+		return $this->id;
 	}
 
 	/**
@@ -221,6 +224,30 @@ class Image
 		}
 
 		return true;
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
+	 * @return  void
+	 */
+	public function destroy()
+	{
+		file_exists($this->getTemporaryPath())
+			and unlink($this->getTemporaryPath());
+
+		if ($this->hasProperty(self::PROPERTY_ICC_PROFILE))
+		{
+			file_exists($this->getProperty(self::PROPERTY_ICC_PROFILE))
+				and unlink($this->getProperty(self::PROPERTY_ICC_PROFILE));
+		}
+
+		if ($this->hasProperty(self::PROPERTY_IPTC_PROFILE))
+		{
+			file_exists($this->getProperty(self::PROPERTY_IPTC_PROFILE))
+				and unlink($this->getProperty(self::PROPERTY_IPTC_PROFILE));
+		}
 	}
 
 	/**
@@ -433,6 +460,17 @@ class Image
 	 *
 	 * @access  protected
 	 * @return  void
+	 */
+	protected function generateId()
+	{
+		return hash('sha1', uniqid(mt_rand(100000000, 999999999), true));
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  protected
+	 * @return  void
 	 *
 	 * @throws  Exception
 	 */
@@ -494,11 +532,9 @@ class Image
 	 */
 	protected function createTemporaryFile($content)
 	{
-		$randomHash = hash('sha1', uniqid(mt_rand(100000000, 999999999), true));
-
 		$temporaryFolder = $this->getTemporaryFolder() . DIRECTORY_SEPARATOR;
 
-		$temporaryFilename = $this->getTemporaryPrefix() . $randomHash;
+		$temporaryFilename = $this->getTemporaryPrefix() . $this->getId();
 
 		$temporaryPath = $temporaryFolder . $temporaryFilename;
 
