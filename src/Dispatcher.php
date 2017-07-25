@@ -59,6 +59,17 @@ class Dispatcher
 	 * {description}
 	 *
 	 * @access  public
+	 * @return  string
+	 */
+	public function getRoot()
+	{
+		return realpath(__DIR__ . '/../');
+	}
+
+	/**
+	 * {description}
+	 *
+	 * @access  public
 	 * @return  Image
 	 */
 	public function getImage()
